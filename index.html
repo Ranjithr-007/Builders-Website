@@ -3,909 +3,1120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BuildCraft — Premier Construction</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>BuildCraft — Premier Construction & Real Estate</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --sky: #0d1b2a;
-    --sky2: #1a2f4a;
-    --accent: #f5a623;
-    --accent2: #e8672a;
-    --steel: #8fa3b1;
-    --glass: rgba(140, 190, 230, 0.22);
-    --glass-bright: rgba(180, 220, 255, 0.35);
-    --crane-yellow: #f0c040;
-    --concrete: #c8b8a2;
-    --text: #f0ece4;
-    --muted: rgba(240,236,228,0.55);
-  }
+:root {
+  --sky: #060d16;
+  --sky2: #0d1b2a;
+  --accent: #f5a623;
+  --accent2: #e8672a;
+  --accent-pale: rgba(245,166,35,0.12);
+  --steel: #8fa3b1;
+  --glass: rgba(140,190,230,0.18);
+  --crane-yellow: #f0c040;
+  --concrete: #c8b8a2;
+  --text: #f0ece4;
+  --muted: rgba(240,236,228,0.5);
+  --card-bg: rgba(255,255,255,0.03);
+  --card-border: rgba(255,255,255,0.07);
+}
 
-  body {
-    background: var(--sky);
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text);
-    overflow-x: hidden;
-  }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--sky);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  overflow-x: hidden;
+}
 
-  /* ── HERO ── */
-  .hero {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    overflow: hidden;
-    padding-bottom: 60px;
-  }
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--sky); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
-  /* Stars */
-  .stars {
-    position: absolute; inset: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .star {
-    position: absolute;
-    width: 2px; height: 2px;
-    border-radius: 50%;
-    background: #fff;
-    animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
-    opacity: 0;
-  }
-  @keyframes twinkle { 0%,100%{opacity:0} 50%{opacity:var(--op,0.7)} }
+/* ─── NAV ─── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 60px;
+  transition: background 0.4s, backdrop-filter 0.4s;
+}
+.nav.scrolled {
+  background: rgba(6,13,22,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(245,166,35,0.12);
+}
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 900;
+  letter-spacing: -0.5px; color: var(--text);
+  text-decoration: none;
+}
+.logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); text-decoration: none; transition: color 0.2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+  height: 1px; background: var(--accent);
+  transform: scaleX(0); transform-origin: left; transition: transform 0.3s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { transform: scaleX(1); }
+.nav-cta {
+  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 11px 26px; border: 1px solid var(--accent);
+  color: var(--accent); border-radius: 2px; cursor: pointer;
+  background: transparent; transition: all 0.25s; font-family: 'DM Sans', sans-serif;
+}
+.nav-cta:hover { background: var(--accent); color: #060d16; }
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+.hamburger span { width: 24px; height: 2px; background: var(--text); transition: all 0.3s; }
 
-  /* Moon */
-  .moon {
-    position: absolute;
-    top: 60px; right: 120px;
-    width: 54px; height: 54px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 38% 38%, #fffbe8, #f0d070 60%, #c8a030);
-    box-shadow: 0 0 40px 10px rgba(240,210,80,0.18), 0 0 80px 30px rgba(240,180,40,0.07);
-    z-index: 1;
-    animation: moonrise 2.4s cubic-bezier(.22,.8,.35,1) forwards;
-    opacity: 0;
-  }
-  @keyframes moonrise { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+/* ─── HERO ─── */
+.hero {
+  position: relative; min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  overflow: hidden; padding: 100px 20px 80px;
+}
+.sky-grad {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, #030810 0%, #060d16 35%, #0d1b2a 70%, #1a3050 100%);
+  z-index: 0;
+}
 
-  /* Sky gradient overlay */
-  .sky-grad {
-    position: absolute; inset: 0;
-    background: linear-gradient(180deg, #060e18 0%, #0d1b2a 40%, #1a3050 75%, #2a4a6a 100%);
-    z-index: 0;
-  }
+/* Stars */
+.stars { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.star {
+  position: absolute; border-radius: 50%; background: #fff;
+  animation: twinkle var(--d,3s) ease-in-out infinite var(--delay,0s); opacity: 0;
+}
+@keyframes twinkle { 0%,100%{opacity:0} 50%{opacity:var(--op,0.7)} }
 
-  /* Ground */
-  .ground {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 80px;
-    background: linear-gradient(180deg, #1a1208 0%, #0d0a05 100%);
-    z-index: 2;
-  }
-  .ground-line {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, #f5a62388, #f5a623, #f5a62388, transparent);
-  }
+/* Moon */
+.moon {
+  position: absolute; top: 70px; right: 140px;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #fffbe8, #f0d070 60%, #c8a030);
+  box-shadow: 0 0 50px 15px rgba(240,210,80,0.15), 0 0 100px 40px rgba(240,180,40,0.06);
+  z-index: 2; animation: moonrise 2.4s cubic-bezier(.22,.8,.35,1) 0.5s forwards; opacity: 0;
+}
+@keyframes moonrise { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
 
-  /* ── SCENE ── */
-  .scene {
-    position: absolute;
-    bottom: 80px; left: 0; right: 0;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 0;
-    z-index: 3;
-  }
+/* Ground */
+.ground {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 90px;
+  background: linear-gradient(180deg,#12100a 0%,#080706 100%); z-index: 5;
+}
+.ground-line {
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg,transparent,rgba(245,166,35,0.5),var(--accent),rgba(245,166,35,0.5),transparent);
+}
 
-  /* Background city silhouette */
-  .bg-city {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 220px;
-    z-index: 0;
-    opacity: 0.25;
-  }
-  .bg-city rect { fill: #0f2030; }
+/* ── SCENE ── */
+.scene {
+  position: absolute; bottom: 90px; left: 0; right: 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  z-index: 3;
+}
 
-  /* ── MAIN BUILDING ── */
-  .building-wrap {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 5;
-    animation: buildingRise 3s cubic-bezier(.16,.84,.44,1) 0.8s forwards;
-    transform: translateY(120%);
-    opacity: 0;
-  }
-  @keyframes buildingRise {
-    0%   { transform: translateY(120%); opacity: 0; }
-    40%  { opacity: 1; }
-    100% { transform: translateY(0);    opacity: 1; }
-  }
+/* Background city silhouette */
+.bg-city {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 240px; z-index: 0; opacity: 0.2;
+}
 
-  .building {
-    position: relative;
-    width: 200px;
-  }
+/* ── MAIN BUILDING ── */
+.building-wrap {
+  position: relative; display: flex; flex-direction: column; align-items: center;
+  z-index: 5;
+  animation: buildingRise 3s cubic-bezier(.16,.84,.44,1) 0.8s forwards;
+  transform: translateY(120%); opacity: 0;
+}
+@keyframes buildingRise {
+  0%   { transform: translateY(120%); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.building { position: relative; width: 210px; }
+.floor-section {
+  width: 100%;
+  background: linear-gradient(180deg, #1e3a52 0%, #152a3e 100%);
+  border-top: 1.5px solid rgba(140,190,220,0.12);
+  position: relative; overflow: hidden; opacity: 0;
+  animation: floorIn 0.5s ease forwards;
+  transform-origin: bottom;
+}
+.floor-section:nth-child(1){ height:28px; animation-delay:3.3s; border-radius:2px 2px 0 0; }
+.floor-section:nth-child(2){ height:28px; animation-delay:3.1s; }
+.floor-section:nth-child(3){ height:28px; animation-delay:2.9s; }
+.floor-section:nth-child(4){ height:28px; animation-delay:2.7s; }
+.floor-section:nth-child(5){ height:28px; animation-delay:2.5s; }
+.floor-section:nth-child(6){ height:28px; animation-delay:2.3s; }
+.floor-section:nth-child(7){ height:28px; animation-delay:2.1s; }
+.floor-section:nth-child(8){ height:28px; animation-delay:1.9s; }
+.floor-section:nth-child(9){ height:28px; animation-delay:1.7s; }
+.floor-section:nth-child(10){ height:28px; animation-delay:1.5s; }
+.floor-section:nth-child(11){ height:28px; animation-delay:1.3s; }
+.floor-section:nth-child(12){ height:28px; animation-delay:1.1s; }
+@keyframes floorIn {
+  from { opacity:0; transform:scaleY(0); }
+  to   { opacity:1; transform:scaleY(1); }
+}
+.windows {
+  display: flex; justify-content: space-around; align-items: center;
+  height: 100%; padding: 5px 8px;
+}
+.win {
+  width: 22px; height: 16px;
+  background: var(--glass);
+  border: 0.5px solid rgba(160,210,255,0.18);
+  border-radius: 1px; position: relative; overflow: hidden;
+}
+.win.lit { background: rgba(245,200,80,0.55); border-color: rgba(245,200,80,0.4); box-shadow: 0 0 8px rgba(245,190,60,0.35); animation: winGlow var(--gd,4s) ease-in-out infinite var(--gdelay,0s); }
+.win.lit2 { background: rgba(140,200,255,0.45); border-color: rgba(100,180,255,0.4); animation: winGlow var(--gd,4s) ease-in-out infinite var(--gdelay,0s); }
+.win.dark { background: rgba(8,16,26,0.7); border-color: rgba(60,100,130,0.12); }
+@keyframes winGlow { 0%,100%{opacity:1} 50%{opacity:0.65} }
 
-  /* Floor sections animate in with stagger */
-  .floor-section {
-    width: 100%;
-    background: linear-gradient(180deg, #1e3a52 0%, #152a3e 100%);
-    border-top: 1.5px solid rgba(140,190,220,0.15);
-    position: relative;
-    overflow: hidden;
-    opacity: 0;
-    animation: floorIn 0.6s ease forwards;
-  }
-  .floor-section:nth-child(1) { height: 28px; animation-delay: 3.2s; border-radius: 2px 2px 0 0; }
-  .floor-section:nth-child(2) { height: 28px; animation-delay: 3.0s; }
-  .floor-section:nth-child(3) { height: 28px; animation-delay: 2.8s; }
-  .floor-section:nth-child(4) { height: 28px; animation-delay: 2.6s; }
-  .floor-section:nth-child(5) { height: 28px; animation-delay: 2.4s; }
-  .floor-section:nth-child(6) { height: 28px; animation-delay: 2.2s; }
-  .floor-section:nth-child(7) { height: 28px; animation-delay: 2.0s; }
-  .floor-section:nth-child(8) { height: 28px; animation-delay: 1.8s; }
-  .floor-section:nth-child(9) { height: 28px; animation-delay: 1.6s; }
-  .floor-section:nth-child(10){ height: 28px; animation-delay: 1.4s; }
+.roof {
+  width: 100%; height: 20px;
+  background: linear-gradient(180deg,#2a4a62 0%,#1a3348 100%);
+  border-radius: 2px 2px 0 0; border-top: 2px solid rgba(140,190,220,0.3);
+  opacity: 0; animation: floorIn 0.5s ease 3.5s forwards; position: relative;
+}
+.antenna {
+  position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
+  width: 3px; height: 35px;
+  background: linear-gradient(180deg,#a0c8e0,#607888); border-radius: 2px;
+  opacity: 0; animation: antIn 0.6s ease 4s forwards;
+}
+@keyframes antIn { from{opacity:0;transform:translateX(-50%) scaleY(0);transform-origin:bottom} to{opacity:1;transform:translateX(-50%) scaleY(1)} }
+.antenna-tip {
+  position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+  width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 14px var(--accent), 0 0 30px rgba(245,166,35,0.5);
+  animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 14px var(--accent),0 0 30px rgba(245,166,35,0.5)} 50%{opacity:0.2;box-shadow:none} }
 
-  @keyframes floorIn {
-    from { opacity: 0; transform: scaleY(0); }
-    to   { opacity: 1; transform: scaleY(1); }
-  }
+/* ── CRANE ── */
+.crane-wrap {
+  position: absolute; right: calc(50% - 220px); bottom: 0; z-index: 6;
+  animation: craneIn 1.8s cubic-bezier(.22,.8,.35,1) 0.3s forwards;
+  opacity: 0; transform: translateX(80px);
+}
+@keyframes craneIn { to{opacity:1;transform:translateX(0)} }
+.crane-rope { transform-origin: 93px 66px; animation: swing 4.5s ease-in-out infinite; }
+@keyframes swing { 0%,100%{transform:rotate(7deg)} 50%{transform:rotate(-7deg)} }
 
-  /* Window grid on each floor */
-  .windows {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    height: 100%;
-    padding: 5px 8px;
-  }
-  .win {
-    width: 22px; height: 16px;
-    background: var(--glass);
-    border: 0.5px solid rgba(160,210,255,0.2);
-    border-radius: 1px;
-    position: relative;
-    overflow: hidden;
-    animation: winGlow var(--gd, 4s) ease-in-out infinite var(--gdelay, 0s);
-  }
-  .win.lit {
-    background: rgba(245,200,80,0.55);
-    border-color: rgba(245,200,80,0.4);
-    box-shadow: 0 0 8px rgba(245,190,60,0.35), inset 0 0 4px rgba(255,230,100,0.3);
-  }
-  .win.lit2 {
-    background: rgba(140,200,255,0.5);
-    border-color: rgba(100,180,255,0.4);
-    box-shadow: 0 0 6px rgba(120,190,255,0.3);
-  }
-  .win.dark { background: rgba(10,20,30,0.6); border-color: rgba(80,120,150,0.15); }
-  @keyframes winGlow { 0%,100%{opacity:1} 50%{opacity:0.7} }
+/* ── SCAFFOLD ── */
+.scaffold {
+  position: absolute; left: calc(50% - 148px); bottom: 0; z-index: 4;
+  opacity: 0; animation: fadeIn 1s ease 2.2s forwards;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
 
-  /* Building roof/cap */
-  .roof {
-    width: 100%;
-    height: 18px;
-    background: linear-gradient(180deg, #2a4a62 0%, #1a3348 100%);
-    border-radius: 2px 2px 0 0;
-    border-top: 2px solid rgba(140,190,220,0.35);
-    opacity: 0;
-    animation: floorIn 0.5s ease 3.4s forwards;
-    position: relative;
-  }
-  .antenna {
-    position: absolute;
-    top: -30px; left: 50%; transform: translateX(-50%);
-    width: 3px; height: 30px;
-    background: linear-gradient(180deg, #a0c8e0, #607888);
-    border-radius: 2px;
-    opacity: 0;
-    animation: fadeIn 0.6s ease 3.8s forwards;
-  }
-  .antenna-tip {
-    position: absolute;
-    top: -6px; left: 50%; transform: translateX(-50%);
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 12px var(--accent), 0 0 24px rgba(245,166,35,0.5);
-    animation: blink 1.4s ease-in-out infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 12px var(--accent), 0 0 24px rgba(245,166,35,0.5)} 50%{opacity:0.3;box-shadow:none} }
-  @keyframes fadeIn { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+/* ── SIDE BUILDINGS ── */
+.side-building-l {
+  position: absolute; left: calc(50% - 310px); bottom: 0; width: 110px; z-index: 3;
+  animation: buildingRise 2.5s cubic-bezier(.16,.84,.44,1) 1.2s forwards;
+  transform: translateY(120%); opacity: 0;
+}
+.side-building-r {
+  position: absolute; right: calc(50% - 310px); bottom: 0; width: 85px; z-index: 3;
+  animation: buildingRise 2.5s cubic-bezier(.16,.84,.44,1) 1.5s forwards;
+  transform: translateY(120%); opacity: 0;
+}
+.side-bld {
+  background: linear-gradient(180deg,#10202e 0%,#0a1520 100%);
+  width: 100%; border-top: 1px solid rgba(140,190,220,0.1);
+}
+.side-win-row { display: flex; justify-content: space-around; padding: 4px 6px; }
+.sw { width: 15px; height: 10px; background: var(--glass); border-radius: 1px; border: 0.5px solid rgba(140,180,220,0.12); }
+.sw.lit { background: rgba(245,200,80,0.4); }
+.sw.lit2 { background: rgba(130,190,255,0.4); }
+.sw.dark { background: rgba(8,16,26,0.6); }
 
-  /* ── CRANE ── */
-  .crane-wrap {
-    position: absolute;
-    right: -60px;
-    bottom: 0;
-    z-index: 6;
-    animation: craneArrive 1.8s cubic-bezier(.22,.8,.35,1) 0.3s forwards;
-    opacity: 0;
-    transform: translateX(60px);
-  }
-  @keyframes craneArrive { to{opacity:1;transform:translateX(0)} }
+/* ── SPARKS ── */
+.sparks-wrap {
+  position: absolute; inset: 0; bottom: 90px;
+  pointer-events: none; z-index: 10; overflow: hidden;
+}
+.spark {
+  position: absolute; border-radius: 50%; opacity: 0;
+  animation: sparkFly var(--sd,1.8s) ease-out infinite var(--sdelay,0s);
+}
+@keyframes sparkFly {
+  0%   { opacity:1; transform:translate(0,0) scale(1); }
+  100% { opacity:0; transform:translate(var(--sx,20px),var(--sy,-40px)) scale(0); }
+}
 
-  .crane-svg { overflow: visible; }
+/* ── BLOCK LIFT ── */
+.block-lift {
+  position: absolute; width: 28px; height: 14px;
+  background: linear-gradient(135deg,#c8a870,#a08050);
+  border: 1px solid rgba(200,180,120,0.35); border-radius: 2px; opacity: 0;
+  animation: liftBlock var(--ld,4.5s) ease-in-out infinite var(--ldelay,0s);
+}
+@keyframes liftBlock {
+  0%  { opacity:0; transform:translateY(0); }
+  10% { opacity:1; }
+  80% { opacity:1; transform:translateY(-200px); }
+  100%{ opacity:0; transform:translateY(-220px); }
+}
 
-  /* Crane hook swing */
-  .crane-rope {
-    transform-origin: 20px 0;
-    animation: swing 4s ease-in-out infinite;
-  }
-  @keyframes swing {
-    0%,100%{transform:rotate(8deg)}
-    50%{transform:rotate(-8deg)}
-  }
+/* ── HERO TEXT ── */
+.hero-content {
+  position: relative; z-index: 20; text-align: center; padding: 0 20px;
+  animation: textIn 1.4s cubic-bezier(.16,.84,.44,1) 0.5s forwards;
+  opacity: 0; transform: translateY(30px); margin-bottom: 40px;
+}
+@keyframes textIn { to{opacity:1;transform:translateY(0)} }
+.hero-eyebrow {
+  font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 18px; opacity: 0.9;
+}
+.hero-h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(52px,7.5vw,96px); font-weight: 900;
+  line-height: 1.0; letter-spacing: -2px; color: var(--text); margin-bottom: 26px;
+}
+.hero-h1 em { color: var(--accent); font-style: normal; }
+.hero-sub {
+  font-size: 16px; color: var(--muted); max-width: 500px;
+  margin: 0 auto 40px; line-height: 1.75; font-weight: 300;
+}
+.hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.btn-primary {
+  padding: 15px 40px; background: var(--accent); color: #060d16;
+  border: none; border-radius: 2px; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.25s;
+}
+.btn-primary:hover { background: #f0b840; transform: translateY(-3px); box-shadow: 0 16px 50px rgba(245,166,35,0.35); }
+.btn-ghost {
+  padding: 14px 38px; background: transparent; color: var(--text);
+  border: 1px solid rgba(240,236,228,0.25); border-radius: 2px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.25s;
+  text-decoration: none; display: inline-flex; align-items: center;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── SCAFFOLD ── */
-  .scaffold {
-    position: absolute;
-    left: -38px;
-    bottom: 0;
-    z-index: 4;
-    opacity: 0;
-    animation: fadeIn 1s ease 2s forwards;
-  }
+/* ── SCROLL INDICATOR ── */
+.scroll-hint {
+  position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%);
+  z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  animation: textIn 1s ease 4.5s forwards; opacity: 0;
+}
+.scroll-dot {
+  width: 1px; height: 50px;
+  background: linear-gradient(180deg,transparent,var(--accent),transparent);
+  animation: scrollPulse 1.8s ease-in-out infinite;
+}
+@keyframes scrollPulse { 0%,100%{opacity:0.3;transform:scaleY(0.6)} 50%{opacity:1;transform:scaleY(1)} }
 
-  /* ── SIDE BUILDING L ── */
-  .side-building-l {
-    position: absolute;
-    left: calc(50% - 260px);
-    bottom: 0;
-    width: 100px;
-    z-index: 3;
-    animation: buildingRise 2.5s cubic-bezier(.16,.84,.44,1) 1.2s forwards;
-    transform: translateY(120%); opacity: 0;
-  }
-  .side-building-r {
-    position: absolute;
-    right: calc(50% - 270px);
-    bottom: 0;
-    width: 80px;
-    z-index: 3;
-    animation: buildingRise 2.5s cubic-bezier(.16,.84,.44,1) 1.5s forwards;
-    transform: translateY(120%); opacity: 0;
-  }
+/* ── STATS ── */
+.stats-bar {
+  position: relative; z-index: 20;
+  display: flex; justify-content: center; flex-wrap: wrap; gap: 0;
+  margin-top: 10px;
+}
+.stat {
+  text-align: center; padding: 0 36px;
+  border-right: 1px solid rgba(240,236,228,0.08);
+}
+.stat:last-child { border-right: none; }
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px; font-weight: 700; color: var(--accent); display: block;
+  animation: countUp 2s ease 2s both;
+}
+@keyframes countUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 4px; display: block; }
 
-  .side-bld {
-    background: linear-gradient(180deg, #142030 0%, #0d1820 100%);
-    width: 100%;
-    border-top: 1.5px solid rgba(140,190,220,0.12);
-  }
-  .side-win-row {
-    display: flex; justify-content: space-around; padding: 4px 5px;
-  }
-  .sw { width: 14px; height: 9px; background: var(--glass); border-radius: 1px; border: 0.5px solid rgba(140,180,220,0.15); }
-  .sw.lit { background: rgba(245,200,80,0.45); }
-  .sw.lit2 { background: rgba(130,190,255,0.45); }
+/* ─── ANIMATED VIDEO SECTION ─── */
+.video-section {
+  background: linear-gradient(180deg,#060d16 0%,#0a1520 100%);
+  padding: 100px 0; overflow: hidden; position: relative;
+}
+.video-section::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(245,166,35,0.04) 0%, transparent 70%);
+}
+.video-inner { max-width: 1200px; margin: 0 auto; padding: 0 60px; }
+.section-tag { font-size: 11px; letter-spacing: 3.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+.section-h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(34px,4vw,56px); font-weight: 700; line-height: 1.1;
+  letter-spacing: -1px; margin-bottom: 60px; max-width: 560px;
+}
 
-  /* ── CONSTRUCTION PARTICLES ── */
-  .sparks-wrap {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 80px;
-    pointer-events: none;
-    z-index: 10;
-    overflow: hidden;
-  }
-  .spark {
-    position: absolute;
-    width: 3px; height: 3px;
-    border-radius: 50%;
-    background: var(--accent);
-    opacity: 0;
-    animation: sparkFly var(--sd, 1.8s) ease-out infinite var(--sdelay, 0s);
-  }
-  @keyframes sparkFly {
-    0%   { opacity: 1; transform: translate(0,0) scale(1); }
-    100% { opacity: 0; transform: translate(var(--sx,20px), var(--sy,-40px)) scale(0); }
-  }
+/* Animated construction timeline */
+.timeline-anim {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+.timeline-visual {
+  position: relative; height: 420px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 4px; overflow: hidden;
+}
+.tv-sky {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg,#06101a 0%,#0d1f30 60%,#162840 100%);
+}
+/* Animated building in video panel */
+.tv-building { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 120px; }
+.tv-floor {
+  height: 20px; width: 100%;
+  background: linear-gradient(180deg,#1e3a52,#152a3e);
+  border-top: 1px solid rgba(140,190,220,0.1);
+  transform: scaleY(0); transform-origin: bottom;
+  animation: tvFloorIn 0.4s ease forwards;
+}
+.tv-floor:nth-child(1){ animation-delay:0.5s; }
+.tv-floor:nth-child(2){ animation-delay:0.9s; }
+.tv-floor:nth-child(3){ animation-delay:1.3s; }
+.tv-floor:nth-child(4){ animation-delay:1.7s; }
+.tv-floor:nth-child(5){ animation-delay:2.1s; }
+.tv-floor:nth-child(6){ animation-delay:2.5s; }
+.tv-floor:nth-child(7){ animation-delay:2.9s; }
+.tv-floor:nth-child(8){ animation-delay:3.3s; }
+@keyframes tvFloorIn { to{transform:scaleY(1)} }
+.tv-win { display: flex; justify-content: space-around; align-items: center; height: 100%; padding: 4px 6px; }
+.tv-w { width: 16px; height: 12px; background: rgba(30,60,90,0.5); border-radius: 1px; }
+.tv-w.on { background: rgba(245,200,80,0.5); animation: tvBlink 3s ease-in-out infinite var(--b,0s); }
+.tv-w.on2 { background: rgba(120,190,255,0.45); }
+@keyframes tvBlink { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
-  /* ── FLOATING BLOCKS (materials being lifted) ── */
-  .block-lift {
-    position: absolute;
-    width: 26px; height: 14px;
-    background: linear-gradient(135deg, #c8a870, #a08050);
-    border: 1px solid rgba(200,180,120,0.4);
-    border-radius: 2px;
-    opacity: 0;
-    animation: liftBlock 3s ease-in-out infinite;
-  }
-  @keyframes liftBlock {
-    0%  { opacity: 0; transform: translateY(0); }
-    10% { opacity: 1; }
-    80% { opacity: 1; transform: translateY(-180px); }
-    100%{ opacity: 0; transform: translateY(-200px); }
-  }
+.tv-ground { position: absolute; bottom: 0; left: 0; right: 0; height: 50px; background: #0a0806; }
+.tv-glow { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 200px; height: 20px; background: radial-gradient(ellipse,rgba(245,166,35,0.2),transparent 70%); animation: glowPulse 2s ease-in-out infinite; }
+@keyframes glowPulse { 0%,100%{opacity:0.5;transform:translateX(-50%) scaleX(0.8)} 50%{opacity:1;transform:translateX(-50%) scaleX(1.2)} }
 
-  /* ── HEADER ── */
-  .nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 22px 60px;
-    background: linear-gradient(180deg, rgba(6,14,24,0.9) 0%, transparent 100%);
-    backdrop-filter: blur(0px);
-  }
-  .logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    color: var(--text);
-  }
-  .logo span { color: var(--accent); }
-  .nav-links { display: flex; gap: 36px; }
-  .nav-links a {
-    font-size: 13px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--text); }
-  .nav-cta {
-    font-size: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 10px 24px;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    border-radius: 2px;
-    cursor: pointer;
-    background: transparent;
-    transition: all 0.2s;
-  }
-  .nav-cta:hover { background: var(--accent); color: #0d1b2a; }
+/* Animated progress rings */
+.tv-stats {
+  position: absolute; bottom: 60px; right: 14px; display: flex; flex-direction: column; gap: 10px;
+  animation: fadeIn 1s ease 4s forwards; opacity: 0;
+}
+.ring-wrap { display: flex; align-items: center; gap: 8px; }
+.ring-label { font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+.ring-bar { width: 60px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+.ring-fill { height: 100%; background: linear-gradient(90deg,var(--accent2),var(--accent)); border-radius: 2px; width: 0; animation: ringIn 1.5s ease forwards var(--rd,0s); }
+@keyframes ringIn { to{width:var(--rw,70%)} }
 
-  /* ── HERO TEXT ── */
-  .hero-text {
-    position: relative;
-    z-index: 20;
-    text-align: center;
-    padding: 0 20px;
-    animation: textIn 1.4s cubic-bezier(.16,.84,.44,1) 0.5s forwards;
-    opacity: 0; transform: translateY(30px);
-  }
-  @keyframes textIn { to{opacity:1;transform:translateY(0)} }
+/* Crane in tv panel */
+.tv-crane {
+  position: absolute; right: 20px; bottom: 50px; z-index: 5;
+  animation: fadeIn 1s ease 0.3s forwards; opacity: 0;
+}
+.tv-crane-rope { transform-origin: 18px 0; animation: swing 4s ease-in-out infinite; }
 
-  .hero-eyebrow {
-    font-size: 11px;
-    letter-spacing: 3.5px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 16px;
-    opacity: 0.9;
-  }
-  .hero-h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(48px, 7vw, 88px);
-    font-weight: 900;
-    line-height: 1.0;
-    letter-spacing: -2px;
-    color: var(--text);
-    margin-bottom: 24px;
-  }
-  .hero-h1 em { color: var(--accent); font-style: normal; }
-  .hero-sub {
-    font-size: 16px;
-    color: var(--muted);
-    max-width: 480px;
-    margin: 0 auto 36px;
-    line-height: 1.7;
-    font-weight: 300;
-  }
-  .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-  .btn-primary {
-    padding: 15px 38px;
-    background: var(--accent);
-    color: #0d1b2a;
-    border: none;
-    border-radius: 2px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-primary:hover { background: #f0b840; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(245,166,35,0.3); }
-  .btn-ghost {
-    padding: 14px 36px;
-    background: transparent;
-    color: var(--text);
-    border: 1px solid rgba(240,236,228,0.3);
-    border-radius: 2px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 400;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-ghost:hover { border-color: var(--text); }
+/* Particles */
+.tv-particles { position: absolute; inset: 0; pointer-events: none; }
+.tv-particle {
+  position: absolute; width: 2px; height: 2px; border-radius: 50%;
+  background: var(--accent); opacity: 0;
+  animation: tvSpark var(--ps,2s) ease-out infinite var(--pd,0s);
+}
+@keyframes tvSpark { 0%{opacity:1;transform:translate(0,0)} 100%{opacity:0;transform:translate(var(--px,10px),var(--py,-30px))} }
 
-  /* ── STATS BAR ── */
-  .stats-bar {
-    position: relative; z-index: 20;
-    display: flex; justify-content: center; gap: 0;
-    margin-top: 48px;
-  }
-  .stat {
-    text-align: center;
-    padding: 0 40px;
-    border-right: 1px solid rgba(240,236,228,0.1);
-  }
-  .stat:last-child { border-right: none; }
-  .stat-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 32px; font-weight: 700;
-    color: var(--accent);
-    display: block;
-  }
-  .stat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+/* Stars in tv panel */
+.tv-star { position: absolute; background: #fff; border-radius: 50%; opacity: 0; animation: twinkle var(--td,3s) ease-in-out infinite var(--delay,0s); }
 
-  /* ── FEATURES SECTION ── */
-  .section {
-    padding: 120px 60px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .section-tag {
-    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 12px;
-  }
-  .section-h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(36px, 4vw, 54px);
-    font-weight: 700; line-height: 1.1;
-    letter-spacing: -1px; margin-bottom: 64px;
-    max-width: 600px;
-  }
+/* Timeline steps */
+.timeline-steps { position: relative; }
+.timeline-steps::before {
+  content: ''; position: absolute; left: 22px; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(180deg,transparent,var(--accent),transparent);
+}
+.t-step {
+  display: flex; gap: 24px; margin-bottom: 36px; position: relative;
+  opacity: 0; transform: translateX(-20px);
+  animation: stepIn 0.6s ease forwards;
+}
+.t-step:nth-child(1){ animation-delay:0.3s; }
+.t-step:nth-child(2){ animation-delay:0.6s; }
+.t-step:nth-child(3){ animation-delay:0.9s; }
+.t-step:nth-child(4){ animation-delay:1.2s; }
+@keyframes stepIn { to{opacity:1;transform:translateX(0)} }
+.t-dot {
+  width: 44px; height: 44px; min-width: 44px; border-radius: 50%;
+  background: var(--accent-pale); border: 1px solid rgba(245,166,35,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; position: relative; z-index: 1;
+}
+.t-info h4 { font-family: 'Playfair Display',serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.t-info p { font-size: 13px; color: var(--muted); line-height: 1.65; font-weight: 300; }
 
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2px;
-  }
-  .feat-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 40px 36px;
-    transition: background 0.3s, transform 0.3s;
-    cursor: default;
-  }
-  .feat-card:hover {
-    background: rgba(245,166,35,0.05);
-    border-color: rgba(245,166,35,0.2);
-    transform: translateY(-4px);
-  }
-  .feat-icon {
-    width: 48px; height: 48px;
-    background: rgba(245,166,35,0.12);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 24px;
-    font-size: 22px;
-  }
-  .feat-h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px; font-weight: 700;
-    margin-bottom: 12px;
-  }
-  .feat-p { font-size: 14px; color: var(--muted); line-height: 1.7; font-weight: 300; }
+/* ─── SERVICES ─── */
+.services-section { padding: 120px 60px; max-width: 1200px; margin: 0 auto; }
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 2px; }
+.svc-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  padding: 44px 38px; transition: all 0.35s; cursor: default; position: relative; overflow: hidden;
+}
+.svc-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg,rgba(245,166,35,0.07),transparent);
+  opacity: 0; transition: opacity 0.35s;
+}
+.svc-card:hover { border-color: rgba(245,166,35,0.25); transform: translateY(-5px); }
+.svc-card:hover::before { opacity: 1; }
+.svc-num {
+  font-family: 'Playfair Display',serif; font-size: 48px; font-weight: 900;
+  color: rgba(245,166,35,0.12); line-height: 1; margin-bottom: 20px;
+  transition: color 0.3s;
+}
+.svc-card:hover .svc-num { color: rgba(245,166,35,0.25); }
+.svc-icon { font-size: 28px; margin-bottom: 16px; }
+.svc-h3 { font-family: 'Playfair Display',serif; font-size: 21px; font-weight: 700; margin-bottom: 14px; }
+.svc-p { font-size: 14px; color: var(--muted); line-height: 1.75; font-weight: 300; }
+.svc-line {
+  width: 30px; height: 2px; background: var(--accent); margin-top: 24px;
+  transform: scaleX(0); transform-origin: left; transition: transform 0.35s 0.1s;
+}
+.svc-card:hover .svc-line { transform: scaleX(1); }
 
-  /* ── PROGRESS SECTION ── */
-  .progress-section {
-    background: linear-gradient(135deg, #0d1b2a 0%, #0a1520 100%);
-    border-top: 1px solid rgba(255,255,255,0.05);
-    padding: 100px 60px;
-  }
-  .progress-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-  .prog-bar-wrap { margin-bottom: 28px; }
-  .prog-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; }
-  .prog-label span:first-child { color: var(--muted); letter-spacing: 0.5px; }
-  .prog-label span:last-child { color: var(--accent); font-weight: 500; }
-  .prog-track {
-    height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden;
-  }
-  .prog-fill {
-    height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent));
-    border-radius: 2px;
-    width: 0;
-    animation: progFill 2s cubic-bezier(.16,.84,.44,1) 0.5s forwards;
-  }
-  @keyframes progFill { to { width: var(--w, 70%); } }
+/* ─── ABOUT / ANIMATED COUNTER ─── */
+.about-section {
+  background: linear-gradient(135deg,#070f18 0%,#0a1822 100%);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  padding: 120px 60px;
+}
+.about-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; }
+.about-text p { font-size: 15px; color: var(--muted); line-height: 1.85; font-weight: 300; margin-bottom: 20px; }
+.counters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.counter-box {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  padding: 32px 28px; position: relative; overflow: hidden;
+}
+.counter-box::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg,transparent,var(--accent),transparent);
+  transform: scaleX(0); transition: transform 0.6s;
+}
+.counter-box:hover::after { transform: scaleX(1); }
+.counter-num {
+  font-family: 'Playfair Display',serif; font-size: 44px; font-weight: 900;
+  color: var(--accent); line-height: 1; margin-bottom: 8px; display: block;
+}
+.counter-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
 
-  /* ── FOOTER ── */
-  .footer {
-    text-align: center;
-    padding: 40px 60px;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    font-size: 12px; color: var(--muted);
-    letter-spacing: 0.5px;
-  }
+/* ─── ANIMATED PROCESS ─── */
+.process-section { padding: 120px 60px; max-width: 1200px; margin: 0 auto; }
+.process-track {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 0;
+  position: relative; margin-top: 60px;
+}
+.process-track::before {
+  content: ''; position: absolute; top: 30px; left: 12%; right: 12%; height: 1px;
+  background: linear-gradient(90deg,transparent,var(--accent),transparent);
+  z-index: 0;
+}
+.proc-item { text-align: center; padding: 0 20px; position: relative; z-index: 1; }
+.proc-circle {
+  width: 60px; height: 60px; border-radius: 50%; background: var(--accent-pale);
+  border: 1px solid rgba(245,166,35,0.35);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px; font-size: 22px;
+  transition: all 0.3s; cursor: default;
+}
+.proc-circle:hover { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 30px rgba(245,166,35,0.4); }
+.proc-h4 { font-family: 'Playfair Display',serif; font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.proc-p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+/* ─── TESTIMONIALS ─── */
+.testimonials-section {
+  background: #070d16; border-top: 1px solid rgba(255,255,255,0.04);
+  padding: 120px 60px;
+}
+.testi-inner { max-width: 1200px; margin: 0 auto; }
+.testi-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 24px; margin-top: 60px; }
+.testi-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  padding: 36px 32px; position: relative;
+}
+.testi-card::before {
+  content: '"'; font-family: 'Playfair Display',serif;
+  font-size: 100px; color: rgba(245,166,35,0.08);
+  position: absolute; top: -10px; left: 24px; line-height: 1;
+}
+.testi-stars { color: var(--accent); font-size: 13px; margin-bottom: 18px; letter-spacing: 2px; }
+.testi-text { font-size: 14px; color: var(--muted); line-height: 1.8; font-weight: 300; margin-bottom: 24px; font-style: italic; }
+.testi-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.testi-role { font-size: 11px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+
+/* ─── CTA BAND ─── */
+.cta-band {
+  position: relative; padding: 100px 60px; overflow: hidden;
+  background: linear-gradient(135deg,#0f1e2e 0%,#0a1520 100%);
+  border-top: 1px solid rgba(245,166,35,0.15);
+  border-bottom: 1px solid rgba(245,166,35,0.15);
+}
+.cta-band::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 80% at 50% 50%,rgba(245,166,35,0.06),transparent);
+}
+.cta-inner { max-width: 700px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+.cta-inner h2 {
+  font-family: 'Playfair Display',serif;
+  font-size: clamp(36px,4vw,58px); font-weight: 900;
+  letter-spacing: -1px; margin-bottom: 20px; line-height: 1.1;
+}
+.cta-inner p { font-size: 16px; color: var(--muted); margin-bottom: 40px; line-height: 1.7; }
+.cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+/* ─── FOOTER ─── */
+.footer-main {
+  background: #040a10; border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 80px 60px 40px;
+}
+.footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; margin-bottom: 60px; }
+.footer-brand p { font-size: 13px; color: var(--muted); line-height: 1.8; margin-top: 16px; max-width: 280px; font-weight: 300; }
+.footer-col h5 { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.footer-col ul a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+.footer-col ul a:hover { color: var(--text); }
+.footer-bottom {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.05); padding-top: 30px;
+  font-size: 12px; color: var(--muted);
+}
+.footer-bottom a { color: var(--accent); text-decoration: none; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .nav { padding: 18px 24px; }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .timeline-anim { grid-template-columns: 1fr; }
+  .about-inner { grid-template-columns: 1fr; gap: 60px; }
+  .process-track { grid-template-columns: 1fr 1fr; gap: 40px; }
+  .process-track::before { display: none; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .services-section, .about-section, .process-section { padding: 80px 24px; }
+  .video-inner, .testimonials-section, .cta-band, .footer-main { padding-left: 24px; padding-right: 24px; }
+  .hero-h1 { font-size: 48px; }
+  .stat { padding: 0 18px; }
+  .side-building-l, .side-building-r { display: none; }
+}
+@media (max-width: 560px) {
+  .moon { display: none; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .process-track { grid-template-columns: 1fr; }
+  .counters-grid { grid-template-columns: 1fr 1fr; }
+  .stats-bar { gap: 8px; }
+  .stat { padding: 0 12px; }
+}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav class="nav">
-  <div class="logo">Build<span>Craft</span></div>
-  <div class="nav-links">
-    <a href="#">Projects</a>
-    <a href="#">Services</a>
-    <a href="#">About</a>
-    <a href="#">Contact</a>
-  </div>
-  <button class="nav-cta">Get Quote</button>
+<nav class="nav" id="mainNav">
+  <a href="index.html" class="logo">Build<span>Craft</span></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#testimonials">Testimonials</a></li>
+    <li><a href="brochure.html">Brochure</a></li>
+  </ul>
+  <button class="nav-cta" onclick="window.location='brochure.html'">Download Brochure</button>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
+<section class="hero" id="home">
   <div class="sky-grad"></div>
-
-  <!-- Stars -->
   <div class="stars" id="stars"></div>
-
-  <!-- Moon -->
   <div class="moon"></div>
-
-  <!-- Sparks -->
   <div class="sparks-wrap" id="sparks"></div>
 
-  <!-- SCENE -->
   <div class="scene">
-
-    <!-- Background city -->
-    <svg class="bg-city" viewBox="0 0 1200 220" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-      <rect x="0" y="120" width="60" height="100"/>
-      <rect x="10" y="80" width="40" height="140"/>
-      <rect x="70" y="140" width="80" height="80"/>
-      <rect x="90" y="100" width="40" height="120"/>
-      <rect x="160" y="70" width="50" height="150"/>
-      <rect x="170" y="40" width="30" height="180"/>
-      <rect x="220" y="90" width="70" height="130"/>
-      <rect x="235" y="60" width="40" height="160"/>
-      <rect x="300" y="110" width="60" height="110"/>
-      <rect x="370" y="130" width="90" height="90"/>
-      <rect x="390" y="90" width="50" height="130"/>
-      <rect x="470" y="60" width="55" height="160"/>
-      <rect x="480" y="30" width="35" height="190"/>
-      <rect x="540" y="80" width="70" height="140"/>
-      <rect x="620" y="50" width="50" height="170"/>
-      <rect x="630" y="20" width="30" height="200"/>
-      <rect x="680" y="100" width="80" height="120"/>
-      <rect x="700" y="70" width="40" height="150"/>
-      <rect x="770" y="130" width="60" height="90"/>
-      <rect x="840" y="80" width="55" height="140"/>
-      <rect x="850" y="50" width="35" height="170"/>
-      <rect x="910" y="110" width="75" height="110"/>
-      <rect x="990" y="60" width="50" height="160"/>
-      <rect x="1050" y="90" width="80" height="130"/>
-      <rect x="1060" y="40" width="60" height="180"/>
-      <rect x="1140" y="120" width="60" height="100"/>
+    <!-- BG city -->
+    <svg class="bg-city" viewBox="0 0 1400 240" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="120" width="70" height="120" fill="#0c1e30"/>
+      <rect x="10" y="80" width="50" height="160" fill="#0a1820"/>
+      <rect x="80" y="140" width="90" height="100" fill="#0c1e30"/>
+      <rect x="100" y="90" width="50" height="150" fill="#0a1820"/>
+      <rect x="180" y="70" width="60" height="170" fill="#0c1e30"/>
+      <rect x="185" y="40" width="40" height="200" fill="#081420"/>
+      <rect x="250" y="100" width="80" height="140" fill="#0c1e30"/>
+      <rect x="265" y="60" width="50" height="180" fill="#0a1820"/>
+      <rect x="340" y="110" width="70" height="130" fill="#0c1e30"/>
+      <rect x="420" y="130" width="100" height="110" fill="#0a1820"/>
+      <rect x="440" y="80" width="60" height="160" fill="#0c1e30"/>
+      <rect x="530" y="60" width="65" height="180" fill="#0a1820"/>
+      <rect x="540" y="20" width="40" height="220" fill="#081420"/>
+      <rect x="610" y="90" width="80" height="150" fill="#0c1e30"/>
+      <rect x="700" y="50" width="60" height="190" fill="#0a1820"/>
+      <rect x="710" y="10" width="40" height="230" fill="#081420"/>
+      <rect x="770" y="100" width="90" height="140" fill="#0c1e30"/>
+      <rect x="790" y="70" width="50" height="170" fill="#0a1820"/>
+      <rect x="870" y="130" width="70" height="110" fill="#0c1e30"/>
+      <rect x="950" y="80" width="65" height="160" fill="#0a1820"/>
+      <rect x="960" y="40" width="45" height="200" fill="#081420"/>
+      <rect x="1030" y="110" width="85" height="130" fill="#0c1e30"/>
+      <rect x="1120" y="60" width="60" height="180" fill="#0a1820"/>
+      <rect x="1190" y="90" width="90" height="150" fill="#0c1e30"/>
+      <rect x="1200" y="30" width="70" height="210" fill="#081420"/>
+      <rect x="1290" y="120" width="110" height="120" fill="#0c1e30"/>
     </svg>
 
     <!-- Side building LEFT -->
     <div class="side-building-l">
-      <div class="side-bld" style="height:180px">
+      <div class="side-bld" style="height:200px">
         <div style="height:100%;display:flex;flex-direction:column;justify-content:space-around;padding:8px 0">
           <div class="side-win-row"><div class="sw lit"></div><div class="sw dark"></div><div class="sw lit2"></div></div>
           <div class="side-win-row"><div class="sw dark"></div><div class="sw lit"></div><div class="sw dark"></div></div>
           <div class="side-win-row"><div class="sw lit2"></div><div class="sw lit"></div><div class="sw dark"></div></div>
           <div class="side-win-row"><div class="sw dark"></div><div class="sw dark"></div><div class="sw lit"></div></div>
           <div class="side-win-row"><div class="sw lit"></div><div class="sw lit2"></div><div class="sw dark"></div></div>
+          <div class="side-win-row"><div class="sw dark"></div><div class="sw lit"></div><div class="sw lit2"></div></div>
         </div>
       </div>
     </div>
 
     <!-- Side building RIGHT -->
     <div class="side-building-r">
-      <div class="side-bld" style="height:140px">
+      <div class="side-bld" style="height:155px">
         <div style="height:100%;display:flex;flex-direction:column;justify-content:space-around;padding:6px 0">
           <div class="side-win-row"><div class="sw lit2"></div><div class="sw dark"></div></div>
           <div class="side-win-row"><div class="sw lit"></div><div class="sw lit"></div></div>
           <div class="side-win-row"><div class="sw dark"></div><div class="sw lit2"></div></div>
           <div class="side-win-row"><div class="sw lit"></div><div class="sw dark"></div></div>
+          <div class="side-win-row"><div class="sw dark"></div><div class="sw lit"></div></div>
         </div>
       </div>
     </div>
 
-    <!-- SCAFFOLD LEFT -->
+    <!-- Scaffold -->
     <div class="scaffold">
-      <svg width="34" height="300" viewBox="0 0 34 300" xmlns="http://www.w3.org/2000/svg">
-        <line x1="6" y1="0" x2="6" y2="300" stroke="#607888" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="28" y1="0" x2="28" y2="300" stroke="#607888" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="6" y1="30" x2="28" y2="30" stroke="#506878" stroke-width="1.5"/>
-        <line x1="6" y1="60" x2="28" y2="60" stroke="#506878" stroke-width="1.5"/>
-        <line x1="6" y1="90" x2="28" y2="90" stroke="#506878" stroke-width="1.5"/>
-        <line x1="6" y1="120" x2="28" y2="120" stroke="#506878" stroke-width="1.5"/>
-        <line x1="6" y1="150" x2="28" y2="150" stroke="#506878" stroke-width="1.5"/>
-        <line x1="6" y1="180" x2="28" y2="180" stroke="#506878" stroke-width="1.5"/>
-        <line x1="6" y1="210" x2="28" y2="210" stroke="#506878" stroke-width="1.5"/>
-        <line x1="6" y1="240" x2="28" y2="240" stroke="#506878" stroke-width="1.5"/>
-        <line x1="6" y1="270" x2="28" y2="270" stroke="#506878" stroke-width="1.5"/>
-        <line x1="6" y1="30" x2="28" y2="60" stroke="#405868" stroke-width="0.8" opacity="0.5"/>
-        <line x1="6" y1="90" x2="28" y2="120" stroke="#405868" stroke-width="0.8" opacity="0.5"/>
-        <line x1="6" y1="150" x2="28" y2="180" stroke="#405868" stroke-width="0.8" opacity="0.5"/>
-        <line x1="6" y1="210" x2="28" y2="240" stroke="#405868" stroke-width="0.8" opacity="0.5"/>
-        <circle cx="6" cy="0" r="3" fill="#8fa3b1"/>
-        <circle cx="28" cy="0" r="3" fill="#8fa3b1"/>
+      <svg width="36" height="340" viewBox="0 0 36 340" xmlns="http://www.w3.org/2000/svg">
+        <line x1="7" y1="0" x2="7" y2="340" stroke="#607888" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="29" y1="0" x2="29" y2="340" stroke="#607888" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="7" y1="30" x2="29" y2="30" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="60" x2="29" y2="60" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="90" x2="29" y2="90" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="120" x2="29" y2="120" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="150" x2="29" y2="150" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="180" x2="29" y2="180" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="210" x2="29" y2="210" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="240" x2="29" y2="240" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="270" x2="29" y2="270" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="300" x2="29" y2="300" stroke="#506878" stroke-width="1.5"/>
+        <line x1="7" y1="30" x2="29" y2="60" stroke="#405868" stroke-width="0.8" opacity="0.5"/>
+        <line x1="7" y1="90" x2="29" y2="120" stroke="#405868" stroke-width="0.8" opacity="0.5"/>
+        <line x1="7" y1="150" x2="29" y2="180" stroke="#405868" stroke-width="0.8" opacity="0.5"/>
+        <line x1="7" y1="210" x2="29" y2="240" stroke="#405868" stroke-width="0.8" opacity="0.5"/>
+        <circle cx="7" cy="0" r="3.5" fill="#8fa3b1"/>
+        <circle cx="29" cy="0" r="3.5" fill="#8fa3b1"/>
       </svg>
     </div>
 
-    <!-- MAIN BUILDING -->
+    <!-- Main building -->
     <div class="building-wrap">
       <div class="building">
         <div class="roof">
-          <div class="antenna">
-            <div class="antenna-tip"></div>
-          </div>
+          <div class="antenna"><div class="antenna-tip"></div></div>
         </div>
-        <!-- Floors (top → bottom, 10 floors) -->
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win dark"></div><div class="win lit" style="--gd:3.5s;--gdelay:0.2s"></div><div class="win dark"></div><div class="win lit2" style="--gd:5s;--gdelay:1s"></div><div class="win dark"></div>
-          </div>
-        </div>
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win lit" style="--gd:4s;--gdelay:0.5s"></div><div class="win dark"></div><div class="win lit" style="--gd:3s;--gdelay:0s"></div><div class="win dark"></div><div class="win lit2" style="--gd:6s;--gdelay:2s"></div>
-          </div>
-        </div>
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win dark"></div><div class="win lit2" style="--gd:4.5s;--gdelay:0.8s"></div><div class="win dark"></div><div class="win lit" style="--gd:3.5s;--gdelay:1.5s"></div><div class="win dark"></div>
-          </div>
-        </div>
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win lit" style="--gd:5s;--gdelay:0.3s"></div><div class="win lit" style="--gd:4s;--gdelay:1.2s"></div><div class="win dark"></div><div class="win dark"></div><div class="win lit2" style="--gd:3s;--gdelay:0.7s"></div>
-          </div>
-        </div>
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win dark"></div><div class="win dark"></div><div class="win lit" style="--gd:3.8s;--gdelay:0.9s"></div><div class="win lit2" style="--gd:5s;--gdelay:0.4s"></div><div class="win dark"></div>
-          </div>
-        </div>
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win lit2" style="--gd:4.2s;--gdelay:1.8s"></div><div class="win dark"></div><div class="win lit" style="--gd:3.6s;--gdelay:0.6s"></div><div class="win dark"></div><div class="win lit" style="--gd:4.8s;--gdelay:1.1s"></div>
-          </div>
-        </div>
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win dark"></div><div class="win lit" style="--gd:3.2s;--gdelay:0.2s"></div><div class="win dark"></div><div class="win lit2" style="--gd:5.5s;--gdelay:1.4s"></div><div class="win lit" style="--gd:4s;--gdelay:0.8s"></div>
-          </div>
-        </div>
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win lit" style="--gd:6s;--gdelay:0.5s"></div><div class="win dark"></div><div class="win lit" style="--gd:3.5s;--gdelay:1.9s"></div><div class="win dark"></div><div class="win dark"></div>
-          </div>
-        </div>
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win dark"></div><div class="win lit2" style="--gd:4s;--gdelay:0.6s"></div><div class="win lit" style="--gd:3.8s;--gdelay:0.3s"></div><div class="win dark"></div><div class="win lit" style="--gd:5.2s;--gdelay:1.6s"></div>
-          </div>
-        </div>
-        <div class="floor-section">
-          <div class="windows">
-            <div class="win lit" style="--gd:3.4s;--gdelay:0.9s"></div><div class="win dark"></div><div class="win dark"></div><div class="win lit2" style="--gd:4.5s;--gdelay:0.4s"></div><div class="win lit" style="--gd:3.9s;--gdelay:1.2s"></div>
-          </div>
-        </div>
+        <div class="floor-section"><div class="windows"><div class="win dark"></div><div class="win lit" style="--gd:3.5s;--gdelay:0.2s"></div><div class="win dark"></div><div class="win lit2" style="--gd:5s;--gdelay:1s"></div><div class="win dark"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win lit" style="--gd:4s;--gdelay:0.5s"></div><div class="win dark"></div><div class="win lit" style="--gd:3s;--gdelay:0s"></div><div class="win dark"></div><div class="win lit2" style="--gd:6s;--gdelay:2s"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win dark"></div><div class="win lit2" style="--gd:4.5s;--gdelay:0.8s"></div><div class="win dark"></div><div class="win lit" style="--gd:3.5s;--gdelay:1.5s"></div><div class="win dark"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win lit" style="--gd:5s;--gdelay:0.3s"></div><div class="win lit" style="--gd:4s;--gdelay:1.2s"></div><div class="win dark"></div><div class="win dark"></div><div class="win lit2" style="--gd:3s;--gdelay:0.7s"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win dark"></div><div class="win dark"></div><div class="win lit" style="--gd:3.8s;--gdelay:0.9s"></div><div class="win lit2" style="--gd:5s;--gdelay:0.4s"></div><div class="win dark"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win lit2" style="--gd:4.2s;--gdelay:1.8s"></div><div class="win dark"></div><div class="win lit" style="--gd:3.6s;--gdelay:0.6s"></div><div class="win dark"></div><div class="win lit" style="--gd:4.8s;--gdelay:1.1s"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win dark"></div><div class="win lit" style="--gd:3.2s;--gdelay:0.2s"></div><div class="win dark"></div><div class="win lit2" style="--gd:5.5s;--gdelay:1.4s"></div><div class="win lit" style="--gd:4s;--gdelay:0.8s"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win lit" style="--gd:6s;--gdelay:0.5s"></div><div class="win dark"></div><div class="win lit" style="--gd:3.5s;--gdelay:1.9s"></div><div class="win dark"></div><div class="win dark"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win dark"></div><div class="win lit2" style="--gd:4s;--gdelay:0.6s"></div><div class="win lit" style="--gd:3.8s;--gdelay:0.3s"></div><div class="win dark"></div><div class="win lit" style="--gd:5.2s;--gdelay:1.6s"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win lit" style="--gd:3.4s;--gdelay:0.9s"></div><div class="win dark"></div><div class="win dark"></div><div class="win lit2" style="--gd:4.5s;--gdelay:0.4s"></div><div class="win lit" style="--gd:3.9s;--gdelay:1.2s"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win dark"></div><div class="win lit" style="--gd:4.2s;--gdelay:1.5s"></div><div class="win lit2" style="--gd:3.7s;--gdelay:0.5s"></div><div class="win dark"></div><div class="win dark"></div></div></div>
+        <div class="floor-section"><div class="windows"><div class="win lit2" style="--gd:5s;--gdelay:0.8s"></div><div class="win lit" style="--gd:3.5s;--gdelay:0.2s"></div><div class="win dark"></div><div class="win lit" style="--gd:4.8s;--gdelay:1.7s"></div><div class="win dark"></div></div></div>
       </div>
     </div>
 
-    <!-- CRANE -->
+    <!-- Crane -->
     <div class="crane-wrap">
-      <svg class="crane-svg" width="120" height="340" viewBox="0 0 120 340" xmlns="http://www.w3.org/2000/svg">
-        <!-- Mast -->
-        <rect x="52" y="60" width="16" height="280" fill="#c0a030" rx="2"/>
-        <!-- Mast detail lines -->
-        <line x1="52" y1="90" x2="68" y2="90" stroke="#a08020" stroke-width="1"/>
-        <line x1="52" y1="120" x2="68" y2="120" stroke="#a08020" stroke-width="1"/>
-        <line x1="52" y1="150" x2="68" y2="150" stroke="#a08020" stroke-width="1"/>
-        <line x1="52" y1="180" x2="68" y2="180" stroke="#a08020" stroke-width="1"/>
-        <line x1="52" y1="210" x2="68" y2="210" stroke="#a08020" stroke-width="1"/>
-        <line x1="52" y1="240" x2="68" y2="240" stroke="#a08020" stroke-width="1"/>
-        <!-- Jib (horizontal arm) -->
-        <rect x="20" y="50" width="100" height="10" fill="#d0b040" rx="2"/>
-        <!-- Counter jib -->
-        <rect x="0" y="50" width="50" height="8" fill="#b89030" rx="2"/>
-        <!-- Counter weight -->
-        <rect x="0" y="42" width="28" height="20" fill="#909090" rx="3"/>
-        <!-- Trolley -->
-        <rect x="85" y="56" width="16" height="10" fill="#808080" rx="1"/>
-        <!-- Rope + hook swinging -->
-        <g class="crane-rope" style="transform-origin:93px 66px">
-          <line x1="93" y1="66" x2="93" y2="140" stroke="#a0a0a0" stroke-width="1.5"/>
-          <path d="M88,140 Q85,148 90,152 Q96,156 100,150 Q104,144 100,140" fill="none" stroke="#a0a0a0" stroke-width="2" stroke-linecap="round"/>
+      <svg width="130" height="360" viewBox="0 0 130 360" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+        <rect x="52" y="60" width="16" height="300" fill="#c0a030" rx="2"/>
+        <line x1="52" y1="90" x2="68" y2="90" stroke="#a08020" stroke-width="1.2"/>
+        <line x1="52" y1="120" x2="68" y2="120" stroke="#a08020" stroke-width="1.2"/>
+        <line x1="52" y1="150" x2="68" y2="150" stroke="#a08020" stroke-width="1.2"/>
+        <line x1="52" y1="180" x2="68" y2="180" stroke="#a08020" stroke-width="1.2"/>
+        <line x1="52" y1="210" x2="68" y2="210" stroke="#a08020" stroke-width="1.2"/>
+        <line x1="52" y1="240" x2="68" y2="240" stroke="#a08020" stroke-width="1.2"/>
+        <line x1="52" y1="270" x2="68" y2="270" stroke="#a08020" stroke-width="1.2"/>
+        <rect x="18" y="50" width="112" height="10" fill="#d0b040" rx="2"/>
+        <rect x="0" y="50" width="52" height="8" fill="#b89030" rx="2"/>
+        <rect x="0" y="42" width="30" height="20" fill="#909090" rx="3"/>
+        <rect x="84" y="56" width="18" height="10" fill="#808080" rx="1"/>
+        <g class="crane-rope">
+          <line x1="93" y1="66" x2="93" y2="150" stroke="#a0a0a0" stroke-width="1.5"/>
+          <path d="M88,150 Q85,159 90,163 Q96,167 100,161 Q105,155 100,150" fill="none" stroke="#a0a0a0" stroke-width="2" stroke-linecap="round"/>
         </g>
-        <!-- Cabin -->
-        <rect x="48" y="56" width="24" height="18" fill="#b89030" rx="2"/>
-        <rect x="52" y="59" width="14" height="10" fill="rgba(180,230,255,0.5)" rx="1"/>
-        <!-- Top cap -->
-        <polygon points="30,50 90,50 80,30 40,30" fill="#c0a030"/>
-        <rect x="55" y="15" width="10" height="16" fill="#d0b040" rx="1"/>
-        <!-- Warning lights on jib -->
-        <circle cx="115" cy="52" r="4" fill="#ff4040"/>
-        <circle cx="20" cy="52" r="3.5" fill="#ff4040"/>
+        <rect x="48" y="56" width="26" height="18" fill="#b89030" rx="2"/>
+        <rect x="53" y="59" width="16" height="10" fill="rgba(180,230,255,0.5)" rx="1"/>
+        <polygon points="28,50 92,50 82,28 38,28" fill="#c0a030"/>
+        <rect x="55" y="12" width="10" height="18" fill="#d0b040" rx="1"/>
+        <circle cx="125" cy="52" r="4.5" fill="#ff4040"/>
+        <circle cx="18" cy="52" r="4" fill="#ff4040"/>
       </svg>
     </div>
 
-    <!-- Floating block being lifted -->
-    <div class="block-lift" style="left:calc(50% + 50px);bottom:200px;animation-delay:1.5s;animation-duration:4.5s;--sdelay:1.5s"></div>
-    <div class="block-lift" style="left:calc(50% + 55px);bottom:200px;animation-delay:3s;animation-duration:4.5s;width:22px;height:12px;background:linear-gradient(135deg,#a08860,#806840)"></div>
+    <!-- Block lifts -->
+    <div class="block-lift" style="left:calc(50% + 55px);bottom:210px;--ld:4.5s;--ldelay:1.5s"></div>
+    <div class="block-lift" style="left:calc(50% + 60px);bottom:210px;--ld:4.5s;--ldelay:3.2s;width:22px;height:12px;background:linear-gradient(135deg,#a08860,#806840)"></div>
   </div>
 
-  <!-- Ground -->
-  <div class="ground">
-    <div class="ground-line"></div>
-  </div>
+  <div class="ground"><div class="ground-line"></div></div>
 
-  <!-- Hero Text -->
-  <div class="hero-text">
-    <p class="hero-eyebrow">Est. 1988 · Award-Winning Builders</p>
+  <!-- Hero text -->
+  <div class="hero-content">
+    <p class="hero-eyebrow">Est. 1988 · Kerala's Premier Builder</p>
     <h1 class="hero-h1">We Build<br><em>Skylines.</em></h1>
     <p class="hero-sub">From foundation to rooftop, crafting structures that stand the test of time — with precision, passion, and purpose.</p>
     <div class="hero-actions">
-      <button class="btn-primary">View Our Projects</button>
-      <button class="btn-ghost">Our Story →</button>
+      <button class="btn-primary" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Explore Services</button>
+      <a href="brochure.html" class="btn-ghost">Download Brochure →</a>
     </div>
   </div>
 
   <!-- Stats -->
   <div class="stats-bar">
-    <div class="stat">
-      <span class="stat-num">250+</span>
-      <span class="stat-label">Projects Built</span>
-    </div>
-    <div class="stat">
-      <span class="stat-num">35yr</span>
-      <span class="stat-label">Experience</span>
-    </div>
-    <div class="stat">
-      <span class="stat-num">18</span>
-      <span class="stat-label">Awards Won</span>
-    </div>
-    <div class="stat">
-      <span class="stat-num">100%</span>
-      <span class="stat-label">On-Time Delivery</span>
+    <div class="stat"><span class="stat-num" data-target="250">0+</span><span class="stat-label">Projects Built</span></div>
+    <div class="stat"><span class="stat-num" data-target="35">0</span><span class="stat-label">Years Experience</span></div>
+    <div class="stat"><span class="stat-num" data-target="18">0</span><span class="stat-label">Awards Won</span></div>
+    <div class="stat"><span class="stat-num" data-target="100">0</span><span class="stat-label">On-Time Delivery</span></div>
+  </div>
+
+  <div class="scroll-hint"><div class="scroll-dot"></div></div>
+</section>
+
+<!-- ANIMATED VIDEO SECTION -->
+<section class="video-section">
+  <div class="video-inner">
+    <p class="section-tag">How We Work</p>
+    <h2 class="section-h2">Building dreams, one floor at a time.</h2>
+    <div class="timeline-anim">
+      <!-- Animated visual panel -->
+      <div class="timeline-visual">
+        <div class="tv-sky"></div>
+        <!-- TV stars -->
+        <div id="tvStars"></div>
+        <!-- TV crane -->
+        <div class="tv-crane">
+          <svg width="90" height="200" viewBox="0 0 90 200" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+            <rect x="36" y="40" width="12" height="160" fill="#c0a030" rx="1"/>
+            <line x1="36" y1="60" x2="48" y2="60" stroke="#a08020" stroke-width="1"/>
+            <line x1="36" y1="80" x2="48" y2="80" stroke="#a08020" stroke-width="1"/>
+            <line x1="36" y1="100" x2="48" y2="100" stroke="#a08020" stroke-width="1"/>
+            <line x1="36" y1="120" x2="48" y2="120" stroke="#a08020" stroke-width="1"/>
+            <rect x="14" y="35" width="76" height="7" fill="#d0b040" rx="1"/>
+            <rect x="0" y="35" width="36" height="5" fill="#b89030" rx="1"/>
+            <rect x="0" y="30" width="20" height="13" fill="#808080" rx="2"/>
+            <rect x="60" y="38" width="12" height="7" fill="#707070" rx="1"/>
+            <g class="tv-crane-rope">
+              <line x1="66" y1="42" x2="66" y2="95" stroke="#a0a0a0" stroke-width="1.2"/>
+              <path d="M62,95 Q60,101 64,104 Q67,107 71,103 Q74,99 71,95" fill="none" stroke="#a0a0a0" stroke-width="1.5" stroke-linecap="round"/>
+            </g>
+            <rect x="32" y="36" width="18" height="13" fill="#b89030" rx="1"/>
+            <polygon points="18,35 62,35 56,20 24,20" fill="#c0a030"/>
+            <rect x="37" y="8" width="7" height="13" fill="#d0b040" rx="1"/>
+            <circle cx="86" cy="36" r="3.5" fill="#ff4040"/>
+            <circle cx="14" cy="36" r="3" fill="#ff4040"/>
+          </svg>
+        </div>
+        <!-- Animated building -->
+        <div class="tv-building">
+          <div class="tv-floor"><div class="tv-win"><div class="tv-w on" style="--b:0.3s"></div><div class="tv-w"></div><div class="tv-w on2"></div><div class="tv-w on" style="--b:1.2s"></div></div></div>
+          <div class="tv-floor"><div class="tv-win"><div class="tv-w"></div><div class="tv-w on" style="--b:0.8s"></div><div class="tv-w"></div><div class="tv-w on2"></div></div></div>
+          <div class="tv-floor"><div class="tv-win"><div class="tv-w on" style="--b:0.5s"></div><div class="tv-w on2"></div><div class="tv-w"></div><div class="tv-w on" style="--b:1.8s"></div></div></div>
+          <div class="tv-floor"><div class="tv-win"><div class="tv-w"></div><div class="tv-w on" style="--b:1.1s"></div><div class="tv-w on2"></div><div class="tv-w"></div></div></div>
+          <div class="tv-floor"><div class="tv-win"><div class="tv-w on2"></div><div class="tv-w"></div><div class="tv-w on" style="--b:0.6s"></div><div class="tv-w on2"></div></div></div>
+          <div class="tv-floor"><div class="tv-win"><div class="tv-w on" style="--b:1.5s"></div><div class="tv-w on2"></div><div class="tv-w"></div><div class="tv-w on" style="--b:0.2s"></div></div></div>
+          <div class="tv-floor"><div class="tv-win"><div class="tv-w"></div><div class="tv-w on" style="--b:0.9s"></div><div class="tv-w on2"></div><div class="tv-w"></div></div></div>
+          <div class="tv-floor"><div class="tv-win"><div class="tv-w on2"></div><div class="tv-w"></div><div class="tv-w on" style="--b:1.4s"></div><div class="tv-w on2"></div></div></div>
+        </div>
+        <div class="tv-ground"></div>
+        <div class="tv-glow"></div>
+        <!-- Mini progress bars -->
+        <div class="tv-stats">
+          <div class="ring-wrap"><div class="ring-label">Structure</div><div class="ring-bar"><div class="ring-fill" style="--rw:95%;--rd:4.2s"></div></div></div>
+          <div class="ring-wrap"><div class="ring-label">Electrical</div><div class="ring-bar"><div class="ring-fill" style="--rw:78%;--rd:4.8s"></div></div></div>
+          <div class="ring-wrap"><div class="ring-label">Interiors</div><div class="ring-bar"><div class="ring-fill" style="--rw:60%;--rd:5.4s"></div></div></div>
+        </div>
+        <!-- Particles -->
+        <div class="tv-particles" id="tvParticles"></div>
+        <!-- Label overlay -->
+        <div style="position:absolute;top:18px;left:18px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);opacity:0.7;">● Live Build</div>
+        <div style="position:absolute;top:18px;right:18px;font-size:10px;color:var(--muted);letter-spacing:1px;">BC-2024-07</div>
+      </div>
+
+      <!-- Steps -->
+      <div>
+        <p style="font-size:15px;color:var(--muted);line-height:1.8;font-weight:300;margin-bottom:40px;">Our construction process is a symphony of precision engineering, creative design, and project management mastery — delivering on time, every time.</p>
+        <div class="timeline-steps">
+          <div class="t-step"><div class="t-dot">🔍</div><div class="t-info"><h4>Site Assessment</h4><p>Geological surveys, soil testing, and feasibility analysis ensure every project is built on solid ground — literally and figuratively.</p></div></div>
+          <div class="t-step"><div class="t-dot">📐</div><div class="t-info"><h4>Design & Planning</h4><p>Our architects and structural engineers collaborate to transform your vision into detailed, code-compliant blueprints.</p></div></div>
+          <div class="t-step"><div class="t-dot">🏗️</div><div class="t-info"><h4>Construction Phase</h4><p>Precision execution with real-time monitoring, quality checkpoints at every floor, and transparent reporting.</p></div></div>
+          <div class="t-step"><div class="t-dot">🔑</div><div class="t-info"><h4>Handover & Support</h4><p>Complete documentation, walkthrough, and 24-month post-completion maintenance support included.</p></div></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
-<section>
-  <div class="section">
-    <p class="section-tag">What We Offer</p>
-    <h2 class="section-h2">Built for the future, grounded in craft.</h2>
-    <div class="features-grid">
-      <div class="feat-card">
-        <div class="feat-icon">🏗️</div>
-        <h3 class="feat-h3">Commercial Construction</h3>
-        <p class="feat-p">High-rise towers, office complexes, and commercial developments delivered with engineering excellence and on-schedule precision.</p>
+<!-- SERVICES -->
+<section class="services-section" id="services">
+  <p class="section-tag">What We Offer</p>
+  <h2 class="section-h2">Built for the future, grounded in craft.</h2>
+  <div class="services-grid">
+    <div class="svc-card">
+      <div class="svc-num">01</div>
+      <div class="svc-icon">🏢</div>
+      <h3 class="svc-h3">Commercial Construction</h3>
+      <p class="svc-p">High-rise towers, office complexes, and commercial developments delivered with engineering excellence and on-schedule precision. From 2 floors to 40+.</p>
+      <div class="svc-line"></div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-num">02</div>
+      <div class="svc-icon">🏠</div>
+      <h3 class="svc-h3">Residential Projects</h3>
+      <p class="svc-p">Luxury villas, apartments, and housing complexes that combine architectural beauty with sustainable construction methods and modern living standards.</p>
+      <div class="svc-line"></div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-num">03</div>
+      <div class="svc-icon">🔧</div>
+      <h3 class="svc-h3">Renovation & Restoration</h3>
+      <p class="svc-p">Breathing new life into existing structures — from heritage preservation to complete interior transformations and structural upgrades.</p>
+      <div class="svc-line"></div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-num">04</div>
+      <div class="svc-icon">📐</div>
+      <h3 class="svc-h3">Architecture & Design</h3>
+      <p class="svc-p">End-to-end design services that translate your vision into functional, beautiful, and code-compliant blueprints with 3D visualizations.</p>
+      <div class="svc-line"></div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-num">05</div>
+      <div class="svc-icon">🏨</div>
+      <h3 class="svc-h3">Real Estate Development</h3>
+      <p class="svc-p">Full-cycle real estate projects from land acquisition and approvals through construction and property management handover.</p>
+      <div class="svc-line"></div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-num">06</div>
+      <div class="svc-icon">🌱</div>
+      <h3 class="svc-h3">Green Construction</h3>
+      <p class="svc-p">Eco-certified builds using sustainable materials, solar integration, rainwater harvesting, and energy-efficient design for LEED compliance.</p>
+      <div class="svc-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT / COUNTERS -->
+<section class="about-section" id="about">
+  <div class="about-inner">
+    <div class="about-text">
+      <p class="section-tag">About BuildCraft</p>
+      <h2 class="section-h2" style="margin-bottom:28px">Three decades of building Kerala's skyline.</h2>
+      <p>Founded in 1988, BuildCraft has grown from a small contracting firm into Kerala's most trusted construction and real estate company. We've shaped the skylines of Kochi, Thiruvananthapuram, Kozhikode, and beyond.</p>
+      <p>Our team of 800+ professionals — engineers, architects, project managers, and craftsmen — brings unmatched expertise to every project, from a single-family home to a 40-storey tower.</p>
+      <p>We don't just build structures. We build legacies that families and businesses call home for generations.</p>
+      <div style="margin-top:36px">
+        <button class="btn-primary" onclick="window.location='brochure.html'">Get Our Brochure</button>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon">🏠</div>
-        <h3 class="feat-h3">Residential Projects</h3>
-        <p class="feat-p">Luxury homes and apartment complexes that combine architectural beauty with sustainable construction methods.</p>
+    </div>
+    <div class="counters-grid" id="counters">
+      <div class="counter-box"><span class="counter-num" data-target="250" data-suffix="+">0</span><span class="counter-label">Projects Completed</span></div>
+      <div class="counter-box"><span class="counter-num" data-target="35" data-suffix="yr">0</span><span class="counter-label">Years in Business</span></div>
+      <div class="counter-box"><span class="counter-num" data-target="800" data-suffix="+">0</span><span class="counter-label">Skilled Employees</span></div>
+      <div class="counter-box"><span class="counter-num" data-target="18" data-suffix="">0</span><span class="counter-label">National Awards</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-section" id="process">
+  <p class="section-tag">Our Process</p>
+  <h2 class="section-h2">Simple steps to your dream structure.</h2>
+  <div class="process-track">
+    <div class="proc-item"><div class="proc-circle">📋</div><h4 class="proc-h4">Consultation</h4><p class="proc-p">Free site visit and requirement gathering session with our senior team.</p></div>
+    <div class="proc-item"><div class="proc-circle">✏️</div><h4 class="proc-h4">Design</h4><p class="proc-p">Custom architectural plans with 3D renders and structural drawings.</p></div>
+    <div class="proc-item"><div class="proc-circle">⚙️</div><h4 class="proc-h4">Build</h4><p class="proc-p">Expert construction with weekly progress reports and quality inspections.</p></div>
+    <div class="proc-item"><div class="proc-circle">🏆</div><h4 class="proc-h4">Deliver</h4><p class="proc-p">On-time handover with full documentation and warranty support.</p></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section" id="testimonials">
+  <div class="testi-inner">
+    <p class="section-tag">Client Stories</p>
+    <h2 class="section-h2">What our clients say about us.</h2>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">BuildCraft delivered our 12-storey commercial tower two weeks ahead of schedule. The quality of finish is extraordinary. They are genuinely Kerala's best.</p>
+        <div class="testi-name">Rajesh Nair</div>
+        <div class="testi-role">Director, Nair Holdings · Kochi</div>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon">🔧</div>
-        <h3 class="feat-h3">Renovation & Restoration</h3>
-        <p class="feat-p">Breathing new life into existing structures — from historic preservation to complete interior transformations.</p>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">From design to handover, BuildCraft was transparent, professional, and incredibly skilled. Our villa in Alappuzha is everything we dreamed of and more.</p>
+        <div class="testi-name">Priya & Sreekanth Menon</div>
+        <div class="testi-role">Homeowners · Alappuzha</div>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon">📐</div>
-        <h3 class="feat-h3">Architecture & Design</h3>
-        <p class="feat-p">End-to-end design services that translate your vision into functional, beautiful, and code-compliant blueprints.</p>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">We've used BuildCraft for three hospital campuses. Their safety record is flawless and their structural engineering team is world-class. Absolute trust.</p>
+        <div class="testi-name">Dr. Anitha Krishnan</div>
+        <div class="testi-role">CEO, Medlife Hospitals · Kerala</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PROGRESS -->
-<div class="progress-section">
-  <div class="progress-inner">
-    <div>
-      <p class="section-tag">Our Expertise</p>
-      <h2 class="section-h2" style="margin-bottom:0">Skills built over three decades.</h2>
-    </div>
-    <div>
-      <div class="prog-bar-wrap">
-        <div class="prog-label"><span>Structural Engineering</span><span>97%</span></div>
-        <div class="prog-track"><div class="prog-fill" style="--w:97%"></div></div>
-      </div>
-      <div class="prog-bar-wrap">
-        <div class="prog-label"><span>Sustainable Building</span><span>89%</span></div>
-        <div class="prog-track"><div class="prog-fill" style="--w:89%"></div></div>
-      </div>
-      <div class="prog-bar-wrap">
-        <div class="prog-label"><span>Project Management</span><span>94%</span></div>
-        <div class="prog-track"><div class="prog-fill" style="--w:94%"></div></div>
-      </div>
-      <div class="prog-bar-wrap">
-        <div class="prog-label"><span>Interior Architecture</span><span>82%</span></div>
-        <div class="prog-track"><div class="prog-fill" style="--w:82%"></div></div>
-      </div>
-      <div class="prog-bar-wrap">
-        <div class="prog-label"><span>Safety Compliance</span><span>100%</span></div>
-        <div class="prog-track"><div class="prog-fill" style="--w:100%"></div></div>
-      </div>
+<!-- CTA BAND -->
+<div class="cta-band">
+  <div class="cta-inner">
+    <h2>Ready to build something<br><em style="color:var(--accent);font-style:normal">extraordinary?</em></h2>
+    <p>Download our full services brochure or speak directly with our project consultants. Your dream structure is one conversation away.</p>
+    <div class="cta-actions">
+      <button class="btn-primary" onclick="window.location='brochure.html'">Download Brochure</button>
+      <button class="btn-ghost">Call +91 98476 12345</button>
     </div>
   </div>
 </div>
 
 <!-- FOOTER -->
-<footer class="footer">
-  <p>© 2024 BuildCraft Construction. All rights reserved.</p>
+<footer class="footer-main">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">Build<span style="color:var(--accent)">Craft</span></div>
+      <p>Kerala's most trusted construction and real estate company since 1988. Building skylines, shaping futures.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Services</h5>
+      <ul>
+        <li><a href="#">Commercial Build</a></li>
+        <li><a href="#">Residential</a></li>
+        <li><a href="#">Renovation</a></li>
+        <li><a href="#">Architecture</a></li>
+        <li><a href="#">Real Estate</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Our Team</a></li>
+        <li><a href="#">Projects</a></li>
+        <li><a href="#">Awards</a></li>
+        <li><a href="brochure.html">Brochure</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Contact</h5>
+      <ul>
+        <li><a href="#">Alappuzha, Kerala</a></li>
+        <li><a href="#">+91 98476 12345</a></li>
+        <li><a href="#">info@buildcraft.in</a></li>
+        <li><a href="#">Mon–Sat 9am–6pm</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 BuildCraft Construction & Real Estate. All rights reserved.</p>
+    <p><a href="#">Privacy Policy</a> · <a href="#">Terms</a></p>
+  </div>
 </footer>
 
 <script>
-// Generate stars
+// Stars
 const starsEl = document.getElementById('stars');
-for (let i = 0; i < 120; i++) {
+for (let i = 0; i < 140; i++) {
   const s = document.createElement('div');
   s.className = 'star';
-  s.style.cssText = `
-    left: ${Math.random()*100}%;
-    top: ${Math.random()*70}%;
-    --d: ${2 + Math.random()*4}s;
-    --delay: ${Math.random()*4}s;
-    --op: ${0.3 + Math.random()*0.7};
-    width: ${Math.random() < 0.2 ? 3 : 2}px;
-    height: ${Math.random() < 0.2 ? 3 : 2}px;
-  `;
+  const size = Math.random() < 0.15 ? 3 : 2;
+  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*65}%;width:${size}px;height:${size}px;--d:${2+Math.random()*4}s;--delay:${Math.random()*5}s;--op:${0.3+Math.random()*0.7}`;
   starsEl.appendChild(s);
 }
 
-// Generate sparks near weld area
+// TV Stars
+const tvStars = document.getElementById('tvStars');
+for (let i = 0; i < 30; i++) {
+  const s = document.createElement('div');
+  s.className = 'tv-star';
+  const size = Math.random() < 0.2 ? 2 : 1;
+  s.style.cssText = `position:absolute;left:${Math.random()*100}%;top:${Math.random()*50}%;width:${size}px;height:${size}px;--td:${2+Math.random()*3}s;--delay:${Math.random()*4}s;--op:${0.4+Math.random()*0.6}`;
+  tvStars.appendChild(s);
+}
+
+// Sparks
 const sparksEl = document.getElementById('sparks');
-const sparkPositions = [
-  { left: '52%', bottom: '45%' },
-  { left: '50%', bottom: '55%' },
-  { left: '53%', bottom: '60%' },
-];
-sparkPositions.forEach((pos, i) => {
-  for (let j = 0; j < 5; j++) {
+const sparkPos = [{left:'52%',bottom:'44%'},{left:'50%',bottom:'54%'},{left:'54%',bottom:'62%'}];
+sparkPos.forEach((pos,i) => {
+  for (let j = 0; j < 6; j++) {
     const sp = document.createElement('div');
     sp.className = 'spark';
-    const angle = (Math.random() * 180 - 90);
-    const dist = 20 + Math.random() * 35;
-    const sx = Math.sin(angle * Math.PI/180) * dist;
-    const sy = -(Math.cos(angle * Math.PI/180) * dist + 20);
-    sp.style.cssText = `
-      left: ${pos.left};
-      bottom: ${pos.bottom};
-      --sd: ${0.8 + Math.random()*1.2}s;
-      --sdelay: ${i * 0.3 + j * 0.5 + Math.random()*0.5}s;
-      --sx: ${sx}px;
-      --sy: ${sy}px;
-      background: ${Math.random() > 0.5 ? '#f5a623' : '#fff'};
-      width: ${1.5 + Math.random()*2}px;
-      height: ${1.5 + Math.random()*2}px;
-    `;
+    const angle = Math.random()*200-100;
+    const dist = 18+Math.random()*32;
+    const sx = Math.sin(angle*Math.PI/180)*dist;
+    const sy = -(Math.cos(angle*Math.PI/180)*dist+18);
+    sp.style.cssText = `left:${pos.left};bottom:${pos.bottom};--sd:${0.7+Math.random()*1.2}s;--sdelay:${i*0.3+j*0.5+Math.random()*0.5}s;--sx:${sx}px;--sy:${sy}px;background:${Math.random()>0.5?'#f5a623':'#fff'};width:${1.5+Math.random()*2}px;height:${1.5+Math.random()*2}px`;
     sparksEl.appendChild(sp);
   }
 });
+
+// TV Particles
+const tvParticles = document.getElementById('tvParticles');
+for (let i = 0; i < 12; i++) {
+  const p = document.createElement('div');
+  p.className = 'tv-particle';
+  p.style.cssText = `left:${40+Math.random()*20}%;bottom:${30+Math.random()*20}%;--ps:${0.8+Math.random()*1.2}s;--pd:${Math.random()*3}s;--px:${(Math.random()-0.5)*40}px;--py:${-(20+Math.random()*30)}px;background:${Math.random()>0.5?'#f5a623':'#fff5cc'}`;
+  tvParticles.appendChild(p);
+}
+
+// Nav scroll
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Animated counter
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target);
+  const suffix = el.dataset.suffix || '';
+  const duration = 2000;
+  const step = target / (duration / 16);
+  let current = 0;
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = Math.floor(current) + suffix;
+    if (current >= target) clearInterval(timer);
+  }, 16);
+}
+
+const counterObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.counter-num').forEach(animateCounter);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.4 });
+const countersEl = document.getElementById('counters');
+if (countersEl) counterObserver.observe(countersEl);
 </script>
 </body>
 </html>
